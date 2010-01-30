@@ -1,3 +1,4 @@
+require 'rubygems'
 require 'ping'
 require 'addressable/uri'
 require 'open-uri'
@@ -79,7 +80,7 @@ module Ikran
       @running = true
       while @running
         line = gets.chomp!
-        puts exec(command)
+        puts exec(line)
       end
     end
   end
