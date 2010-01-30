@@ -1,19 +1,14 @@
 require 'rubygems'
 require 'ping'
 require 'addressable/uri'
-require 'open-uri'
+require 'net/http'
 require 'uri'
 
 module Ikran
   class Reader
-    attr_accessor :server, :verbose
-
-    def remote
-      @server
-    end
+    attr_accessor :verbose
 
     COMMANDS = ["exit", "server", "ping", "head", "verbose"]
-
 
     def parse(command)
       cmd = command.split(' ')
@@ -31,40 +26,37 @@ module Ikran
       if val
         begin
           @server = Addressable::URI.heuristic_parse(val).to_s
-          "remote set to #{remote}"
+          "remote set to #{@server}"
         rescue Addressable::URI::InvalidURIError => e
           "invalid url"
         end
       else
-        "current remote is #{remote}"
+        @server ? "current remote is #{@server}" : "remote is not set"
       end
     end
 
     def ping
       if not @server
         "remote must be set before executing ping without parameters"
-      elsif Ping.pingecho(URI.parse(@server))
-        "#{remote} is alive"
+      elsif Ping.pingecho(URI.parse(@server), 5, "icmp")
+        "#{@server} is alive"
       else
-        "#{remote} is unreachable"
+        "#{@server} is unreachable"
       end
     end
 
     def head
-      return "remote must be set before executing get" unless @server
-
-      open(remote) do |f|
-        if @verbose
-          f.meta.map { |k, v| "#{k}: #{v}"}
-        else
-          f.status.join " "
-        end
+      return "remote must be set before executing head" unless @server
+      res = Net::HTTP.get_response(URI.parse(@server))
+      if res.inspect =~ /#<Net::HTTP[a-zA-Z]+ (.+) readbody=(?:true|false)>/
+        @verbose ? res.body : $1
+      else
+        "invalid response #{res.inspect}"
       end
     end
 
     def verbose
-      "verbose is now " + (@verbose = !@verbose ? "ON" : "OFF") 
-
+      "verbose is now " + (@verbose = !@verbose ? "ON" : "OFF")
     end
 
     def exec(command)
@@ -72,17 +64,28 @@ module Ikran
       if cmd
         instance_eval(cmd)
       else
-        "command doesn't exist"
+        "command #{command} doesn't exist"
       end
     end
 
     def run
       @running = true
       while @running
+        print ">> "
         line = gets.chomp!
         puts exec(line)
       end
     end
-  end
 
+    def self.aliases(opts)
+      opts.each do |original, aliased|
+        [*aliased].each do |a|
+          alias_method a, original
+          COMMANDS << a.to_s
+        end
+      end
+    end
+
+    aliases :server => [:s, :r, :remote], :head => :h, :ping => :p, :verbose => :v, :exit => :e
+  end
 end
