@@ -39,17 +39,31 @@ describe "Ikran" do
       it "should return 'server is alive' if server is available" do
         Ping.stub!(:pingecho).and_return(true)
         @reader.exec("server example.com")
-        @reader.exec("ping").should == "#{@reader.server} is alive"
+        @reader.exec("ping").should == "#{@reader.remote} is alive"
       end
 
       it "should return 'server is unreachable' if server is unreachable" do
         Ping.stub!(:pingecho).and_return(false)
         @reader.exec("server example.com")
-        @reader.exec("ping").should == "#{@reader.server} is unreachable"
+        @reader.exec("ping").should == "#{@reader.remote} is unreachable"
       end
     end
   end
 
-  it "should send a GET request to given url on 'get' command"
+  context "server is example.com" do
+    before :all do
+      @reader = Ikran::Reader.new
+      @reader.exec("server example.com")
+    end
+
+    context "non verbose mod" do
+      it "should send a GET request to given url on 'get' command" do
+        @reader.exec("get").should == "200 OK"
+      end
+
+    end
+
+  end
+
   it "should send a POST request to given url on 'post' command"
 end
