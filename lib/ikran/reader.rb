@@ -22,6 +22,7 @@ module Ikran
     end
 
     def exit
+      @running = false
       "exitting ..."
     end
 
@@ -71,6 +72,14 @@ module Ikran
         instance_eval(cmd)
       else
         "command doesn't exist"
+      end
+    end
+
+    def run
+      @running = true
+      while @running
+        line = gets.chomp!
+        puts exec(command)
       end
     end
   end
