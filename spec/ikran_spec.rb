@@ -12,13 +12,13 @@ describe "Ikran" do
 
   it "should allow me to set remote server via 'server' command" do
     server = 'example.com'
-    @reader.exec("server #{server}").should == "remote set to #{server}"
+    @reader.exec("server #{server}").should == "remote set to #{@reader.remote}"
   end
 
   it "should return current remote server on 'server' command without any parameters" do
     server = 'example.com'
     @reader.exec("server #{server}")
-    @reader.exec("server").should == "current remote is #{server}"
+    @reader.exec("server").should == "current remote is #{@reader.remote}"
   end
 
   it "should accept only valid url for server command" do
@@ -52,18 +52,20 @@ describe "Ikran" do
 
   context "server is example.com" do
     before :all do
-      @reader = Ikran::Reader.new
-      @reader.exec("server example.com")
+
     end
 
     context "non verbose mod" do
-      it "should send a GET request to given url on 'get' command" do
-        @reader.exec("get").should == "200 OK"
+      it "should send a HEAD request to given url on 'head' command" do
+        @reader = Ikran::Reader.new
+        @reader.exec("server example.com")
+        @reader.exec("head").should == "200 OK"
       end
 
     end
 
   end
 
+  it "should send a GET request to given url on 'get' command"
   it "should send a POST request to given url on 'post' command"
 end
