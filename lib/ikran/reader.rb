@@ -1,5 +1,4 @@
 require 'rubygems'
-require 'ping'
 require 'addressable/uri'
 require 'net/http'
 require 'uri'
