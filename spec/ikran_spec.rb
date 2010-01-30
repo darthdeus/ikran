@@ -7,7 +7,7 @@ describe "Ikran" do
   end
 
   it "should stop expecting input after 'exit' command'" do
-    @reader.exec('exit').should == 'exitting ...'
+    @reader.exec('exit').should == 'exiting ...'
   end
 
   it "should allow me to set remote server via 'server' command" do
@@ -41,13 +41,13 @@ describe "Ikran" do
 
     context "testing availability" do
       it "should return 'server is alive' if server is available" do
-        Ping.stub!(:pingecho).and_return(true)
+        @reader.stub!(:http_ping).and_return(true)
         @reader.exec("server example.com")
         @reader.exec("ping").should == "http://example.com is alive"
       end
 
       it "should return 'server is unreachable' if server is unreachable" do
-        Ping.stub!(:pingecho).and_return(false)
+        @reader.stub!(:http_ping).and_return(false)
         @reader.exec("server example.com")
         @reader.exec("ping").should == "http://example.com is unreachable"
       end

@@ -9,6 +9,7 @@ module Ikran
     attr_accessor :verbose
 
     COMMANDS = ["exit", "server", "ping", "head", "verbose"]
+    STATUS_REGEXP = /#<Net::HTTP[a-zA-Z]+ (.+) readbody=(?:true|false)>/
 
     def parse(command)
       cmd = command.split(' ')
@@ -19,7 +20,7 @@ module Ikran
 
     def exit
       @running = false
-      "exitting ..."
+      "exiting ..."
     end
 
     def server(val = nil)
@@ -38,17 +39,25 @@ module Ikran
     def ping
       if not @server
         "remote must be set before executing ping without parameters"
-      elsif Ping.pingecho(URI.parse(@server), 5, "icmp")
+      elsif http_ping(@server)
         "#{@server} is alive"
       else
         "#{@server} is unreachable"
       end
     end
 
+    def http_ping(url)
+      get_url(url).to_i < 400
+    end
+
+    def get_url(url)
+      Net::HTTP.get_response(URI.parse(url)).inspect =~ STATUS_REGEXP
+    end
+
     def head
       return "remote must be set before executing head" unless @server
       res = Net::HTTP.get_response(URI.parse(@server))
-      if res.inspect =~ /#<Net::HTTP[a-zA-Z]+ (.+) readbody=(?:true|false)>/
+      if res.inspect =~ STATUS_REGEXP
         @verbose ? res.body : $1
       else
         "invalid response #{res.inspect}"
