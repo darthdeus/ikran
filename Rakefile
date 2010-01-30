@@ -11,6 +11,7 @@ begin
     gem.homepage = "http://github.com/darthdeus/ikran"
     gem.authors = ["darthdeus"]
     gem.add_development_dependency "rspec", ">= 1.2.9"
+    gem.add_development_dependency "cucumber", ">= 0.6.2"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
