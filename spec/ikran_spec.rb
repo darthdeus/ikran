@@ -50,24 +50,18 @@ describe "Ikran" do
     end
   end
 
-  context "server is example.com" do
-    before :all do
-
-    end
-
-    context "non verbose mod" do
-      it "should send a HEAD request to given url on 'head' command" do
-        @reader = Ikran::Reader.new
-        @reader.exec("server example.com")
-        @reader.exec("head").should == "200 OK"
-      end
-
-    end
-
+  it "should toggle verbose on 'verbose' command" do
+    @reader.exec("verbose").should == "verbose is now ON"
+    @reader.exec("verbose").should == "verbose is now OFF"
   end
 
-  it "should send a GET request to given url on 'get' command"
-  it "should send a POST request to given url on 'post' command"
+  context "non verbose mod" do
+    it "should send a request to given url on 'head' command" do
+      @reader = Ikran::Reader.new
+      @reader.exec("server example.com")
+      @reader.exec("head").should == "200 OK"
+    end
+  end
 
   context "parsing" do
     it "should return entire command if no parameters are passed" do

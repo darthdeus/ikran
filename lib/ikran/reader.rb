@@ -1,17 +1,17 @@
 require 'ping'
 require 'addressable/uri'
-require 'net/http'
+require 'open-uri'
 require 'uri'
 
 module Ikran
   class Reader
-    attr_accessor :server
+    attr_accessor :server, :verbose
 
     def remote
-      @server.to_s
+      @server
     end
 
-    COMMANDS = ["exit", "server", "ping", "head"]
+    COMMANDS = ["exit", "server", "ping", "head", "verbose"]
 
 
     def parse(command)
@@ -28,7 +28,7 @@ module Ikran
     def server(val = nil)
       if val
         begin
-          @server = Addressable::URI.heuristic_parse(val)
+          @server = Addressable::URI.heuristic_parse(val).to_s
           "remote set to #{remote}"
         rescue Addressable::URI::InvalidURIError => e
           "invalid url"
@@ -41,7 +41,7 @@ module Ikran
     def ping
       if not @server
         "remote must be set before executing ping without parameters"
-      elsif Ping.pingecho(@server)
+      elsif Ping.pingecho(URI.parse(@server))
         "#{remote} is alive"
       else
         "#{remote} is unreachable"
@@ -50,12 +50,19 @@ module Ikran
 
     def head
       return "remote must be set before executing get" unless @server
-      res = Net::HTTP.get_response(URI.parse(remote))
-      if res.inspect =~ /#<Net::HTTP[a-zA-Z]+ (.+) readbody=(?:true|false)>/
-        $1
-      else
-        "invalid response #{res.inspect}"
+
+      open(remote) do |f|
+        if @verbose
+          f.meta.map { |k, v| "#{k}: #{v}"}
+        else
+          f.status.join " "
+        end
       end
+    end
+
+    def verbose
+      "verbose is now " + (@verbose = !@verbose ? "ON" : "OFF") 
+
     end
 
     def exec(command)
