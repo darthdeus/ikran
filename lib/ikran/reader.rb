@@ -7,7 +7,7 @@ module Ikran
   class Reader
     attr_accessor :verbose
 
-    COMMANDS = ["exit", "server", "ping", "head", "verbose"]
+    COMMANDS = ["exit", "server", "ping", "head", "verbose", "truncate"]
     STATUS_REGEXP = /#<Net::HTTP[a-zA-Z]+ (.+) readbody=(?:true|false)>/
 
     def parse(command)
@@ -57,14 +57,28 @@ module Ikran
       return "remote must be set before executing head" unless @server
       res = Net::HTTP.get_response(URI.parse(@server))
       if res.inspect =~ STATUS_REGEXP
-        @verbose ? res.body : $1
+        if @verbose
+          (@size.to_i > 0) ? res.body[0, @size] : res.body
+        else
+          $1
+        end
       else
         "invalid response #{res.inspect}"
       end
     end
 
     def verbose
+      # TODO - add option to truncate output to max number of characters
       "verbose is now " + ((@verbose = !@verbose) ? "ON" : "OFF")
+    end
+
+    def truncate(size = nil)
+      if size
+        @size = (size.to_i == 0 ? nil : size.to_i)
+        @size ? "maximum size set to #{@size}" : "maximum size set to infinite"
+      else
+        @size ? "maximum size is #{@size}" : "maximum size is infinite" 
+      end
     end
 
     def exec(command)
@@ -94,6 +108,7 @@ module Ikran
       end
     end
 
-    aliases :server => [:s, :r, :remote], :head => :h, :ping => :p, :verbose => :v, :exit => :e
+    aliases :server => [:s, :r, :remote], :head => :h, :ping => :p, :verbose => :v, :exit => :e,
+            :truncate => :t
   end
 end

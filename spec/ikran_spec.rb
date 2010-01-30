@@ -63,6 +63,19 @@ describe "Ikran" do
     @reader.exec("head").should == "remote must be set before executing head"
   end
 
+  it "should have default maximum size set to infinite" do
+    @reader.exec("truncate").should == "maximum size is infinite"
+  end
+
+  it "should return actual maximum size after truncate with parameter" do
+    @reader.exec("truncate 20").should == "maximum size set to 20"
+  end
+
+  it "should return actual maximum size after setting it with truncate" do
+    @reader.exec("truncate 20")
+    @reader.exec("truncate").should == "maximum size is 20"
+  end
+
   context "non verbose mod" do
     it "should send a request to given url on 'head' command" do
       @reader = Ikran::Reader.new
