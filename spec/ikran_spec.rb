@@ -68,4 +68,24 @@ describe "Ikran" do
 
   it "should send a GET request to given url on 'get' command"
   it "should send a POST request to given url on 'post' command"
+
+  context "parsing" do
+    it "should return entire command if no parameters are passed" do
+      @reader.parse("server").should == "server"
+    end
+
+    it "should return entire command if only one parameter is passed with quoted parameter" do
+      @reader.parse("server first").should == "server 'first'"
+    end
+
+    it "should parse and return only first two words in command with quoted parameter" do
+      @reader.parse("server first second").should == "server 'first'"
+    end
+
+    it "should return nil if command is invalid" do
+      @reader.parse("foo").should == nil
+    end
+
+  end
+
 end
