@@ -64,7 +64,7 @@ module Ikran
     end
 
     def verbose
-      "verbose is now " + (@verbose = !@verbose ? "ON" : "OFF")
+      "verbose is now " + ((@verbose = !@verbose) ? "ON" : "OFF")
     end
 
     def exec(command)
