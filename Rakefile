@@ -11,8 +11,8 @@ begin
     gem.homepage = "http://github.com/darthdeus/ikran"
     gem.authors = ["darthdeus"]
     gem.add_dependency "addressable", ">= 2.1.1"
-    gem.add_development_dependency "rspec", ">= 1.2.9"
-    gem.add_development_dependency "cucumber", ">= 0.6.2"
+    gem.add_development_dependency "rspec", ">= 2.0.0"
+    gem.add_development_dependency "cucumber", ">= 0.9.4"
     # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
@@ -20,19 +20,11 @@ rescue LoadError
   puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
 end
 
-require 'spec/rake/spectask'
-Spec::Rake::SpecTask.new(:spec) do |spec|
-  spec.libs << 'lib' << 'spec'
-  spec.spec_files = FileList['spec/**/*_spec.rb']
-end
-
-Spec::Rake::SpecTask.new(:rcov) do |spec|
-  spec.libs << 'lib' << 'spec'
+require "rspec/core/rake_task"
+RSpec::Core::RakeTask.new(:core) do |spec|
   spec.pattern = 'spec/**/*_spec.rb'
-  spec.rcov = true
+  spec.rspec_opts = ['--backtrace']
 end
-
-task :spec => :check_dependencies
 
 task :default => :spec
 
