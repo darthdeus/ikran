@@ -1,9 +1,8 @@
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'ikran/reader'
-require 'spec'
-require 'spec/autorun'
+require 'rspec'
 
-Spec::Runner.configure do |config|
-  
+Rspec.configure do |c|
+  c.mock_with :rspec
 end
