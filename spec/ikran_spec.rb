@@ -31,7 +31,7 @@ describe "Ikran" do
   end
 
   it "should show error on non-existing command" do
-    @reader.exec("foo").should == "command foo doesn't exist"
+    @reader.exec("foo").should == Ikran::Reader::HELP
   end
 
   context "ping command" do

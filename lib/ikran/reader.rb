@@ -10,6 +10,16 @@ module Ikran
     COMMANDS = ["exit", "server", "ping", "head", "verbose", "truncate"]
     STATUS_REGEXP = /#<Net::HTTP[a-zA-Z]+ (.+) readbody=(?:true|false)>/
 
+    HELP =  """
+command doesn't exist
+
+head, h     - HEAD request
+ping, p     - try to ping the remote server
+verbose, v  - turn on/off verbose mod
+remote, r   - set remote server
+truncate, t - set maximum size of response to display
+      """
+
     def parse(command)
       cmd = command.split(' ')
       if COMMANDS.include? cmd.first
@@ -86,7 +96,7 @@ module Ikran
       if cmd
         instance_eval(cmd)
       else
-        "command #{command} doesn't exist"
+        HELP
       end
     end
 
